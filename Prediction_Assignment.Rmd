@@ -46,6 +46,7 @@ fitControl = trainControl( method = "cv", number = 2)
 # Perform the cross validation
 cv <- train(classe ~ ., data = training, method = "rf", 
   trControl = fitControl)
+cv$bestTune$mtry
 ```
 
 ## Exploratory Data Analysis
@@ -54,7 +55,7 @@ cv
 ```
 
 ## Build random forest model with full training model
-Bete Tune of number of variable randomly sampled is: `r cv$bestTune$mtry`
+Best Tune of number of variable randomly sampled is: `r cv$bestTune$mtry`
 ```{r}
 RandomForest = randomForest(classe ~ ., data = training, 
                             mtry = cv$bestTune$mtry)
