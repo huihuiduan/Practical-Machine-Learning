@@ -1,0 +1,87 @@
+---
+title: "Prediction Assigment"
+author: "Huihui Duan"
+date: "June 21, 2014"
+output: ioslides_presentation
+---
+
+## Data Cleaning
+
+To clean the data, the first row index and all colomuns with NA were removed. The traing and testing data were saved as traing2.csv and testing2.csv. 
+```{r}
+# Remove everything in current working library
+rm(list = ls())
+# Read cleaned training and testing data 
+training <- read.table(file = "pml-training2.csv", 
+                       header = TRUE, sep = ",", quote = "")
+testing <- read.table(file = "pml-testing2.csv", 
+                      header = TRUE, sep = ",", quote = "")
+# Change the numeric type to integer type to make sure 
+# the same data type in training data and testing data
+training$magnet_dumbbell_z <- as.integer(training$magnet_dumbbell_z)
+training$magnet_forearm_y <- as.integer(training$magnet_forearm_y)
+training$magnet_forearm_z <- as.integer(training$magnet_forearm_z)
+# Change the 
+levels(testing$new_window) <- levels(training$new_window)
+```
+
+
+## Exploratory Data Analysis
+
+Cross Validation was performed to find the out of sample errors. 
+
+```{r}
+# Install randomForest package
+# install.packages("randomForest")
+library(randomForest)
+# install.packages("caret")
+library(caret)
+```
+
+## Exploratory Data Analysis
+```{r}
+set.seed(111)
+# Define cross-validation experiment
+fitControl = trainControl( method = "cv", number = 2)
+# Perform the cross validation
+cv <- train(classe ~ ., data = training, method = "rf", 
+  trControl = fitControl)
+```
+
+## Exploratory Data Analysis
+```{r}
+cv
+```
+
+## Build random forest model with full training model
+Bete Tune of number of variable randomly sampled is: `r cv$bestTune$mtry`
+```{r}
+RandomForest = randomForest(classe ~ ., data = training, 
+                            mtry = cv$bestTune$mtry)
+PredictForTrain = predict(RandomForest)
+table(PredictForTrain, training$classe)
+```
+
+## Predict testing data
+```{r}
+PredictForest = predict(RandomForest, newdata = testing)
+PredictForest
+```
+
+## Write the Prediction to files
+```{r}
+# Function to write a vector to files
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_", i ,".txt")
+    write.table(x[i], file = filename, quote = FALSE,
+                row.names = FALSE, col.names = FALSE)
+  }
+}
+# Call the function
+pml_write_files(PredictForest)
+
+```
+
+
