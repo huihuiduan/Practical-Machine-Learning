@@ -132,7 +132,10 @@ library(caret)</pre>
 fitControl = trainControl( method = &quot;cv&quot;, number = 2)
 # Perform the cross validation
 cv &lt;- train(classe ~ ., data = training, method = &quot;rf&quot;, 
-  trControl = fitControl)</pre>
+  trControl = fitControl)
+cv$bestTune$mtry</pre>
+
+<pre >## [1] 28</pre>
 
 </article></slide><slide class=''><hgroup><h2>Exploratory Data Analysis</h2></hgroup><article  id="exploratory-data-analysis-2">
 
@@ -161,7 +164,7 @@ cv &lt;- train(classe ~ ., data = training, method = &quot;rf&quot;,
 
 </article></slide><slide class=''><hgroup><h2>Build random forest model with full training model</h2></hgroup><article  id="build-random-forest-model-with-full-training-model">
 
-<p>Bete Tune of number of variable randomly sampled is: 28</p>
+<p>Best Tune of number of variable randomly sampled is: 28</p>
 
 <pre class = 'prettyprint lang-r'>RandomForest = randomForest(classe ~ ., data = training, 
                             mtry = cv$bestTune$mtry)
